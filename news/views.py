@@ -28,7 +28,7 @@ def job():
     msg="come tommorrow"
     send_email(subject,msg,"ashishsasmal1@gmail.com")
 
-schedule.every(10).seconds.do(job)
+schedule.every(60*30).seconds.do(job)
 
 def home(request):
     while True:
@@ -37,7 +37,7 @@ def home(request):
     return render(request,'news/home.html')
 
 def test(request):
-    
+
     return render(request,'news/test.html')
 
 
