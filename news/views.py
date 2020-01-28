@@ -28,7 +28,9 @@ def send_email(subject,msg,email_id):
         for i in msg:
             notice+="\nTITLE : "+str(i[0])+"\nURL : "+str(i[1])+"\n"
         print(notice)
-        server.sendmail(EMAIL_ID,email_id,notice)
+        email_ids=list(Profile.objects.values_list('email',flat=True))
+        for id in email_ids:
+            server.sendmail(EMAIL_ID,id,notice)
         server.quit()
         print("success! after sent!")
 
@@ -51,9 +53,14 @@ schedule.every(10).seconds.do(job)
 def home(request):
     if request.method=="POST":
         email=request.POST.get('email')
-        form=Profile(email=email)
-        form.save()
-        messages.success(request,'You are subscribed!')
+        check=Profile.objects.filter(email=email).exists()
+        if not check:
+            form=Profile(email=email)
+            form.save()
+            messages.success(request,'You are subscribed!')
+        else:
+            messages.warning(request,'You are already subscribed!')
+
     return render(request,'news/home.html')
 
 def test(request):

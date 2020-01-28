@@ -12,7 +12,7 @@ class LastNotice(models.Model):
         return f'{self.title}'
 
 class Profile(models.Model):
-    email=models.EmailField()
+    email=models.EmailField(unique=True)
 
     def __str__(self):
-        return f'{email}'
+        return f'{self.email}'
