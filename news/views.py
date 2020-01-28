@@ -4,12 +4,12 @@ import os
 
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-
+from django.contrib import messages
 import time
 import smtplib
 from bs4 import BeautifulSoup
 import requests
-from .models import LastNotice
+from .models import LastNotice,Profile
 from datetime import date
 
 EMAIL_ID = os.environ.get('EMAIL_ID')
@@ -49,6 +49,11 @@ schedule.every(10).seconds.do(job)
 
 
 def home(request):
+    if request.method=="POST":
+        email=request.POST.get('email')
+        form=Profile(email=email)
+        form.save()
+        messages.success(request,'You are subscribed!')
     return render(request,'news/home.html')
 
 def test(request):

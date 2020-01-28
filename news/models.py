@@ -10,3 +10,9 @@ class LastNotice(models.Model):
 
     def __str__(self):
         return f'{self.title}'
+
+class Profile(models.Model):
+    email=models.EmailField()
+
+    def __str__(self):
+        return f'{email}'
