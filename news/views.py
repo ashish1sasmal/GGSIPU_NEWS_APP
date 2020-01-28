@@ -60,7 +60,7 @@ def home(request):
             messages.success(request,'You are subscribed!')
         else:
             messages.warning(request,'You are already subscribed!')
-
+    job()
     return render(request,'news/home.html')
 
 def test(request):
