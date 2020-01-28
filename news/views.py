@@ -47,7 +47,7 @@ def job():
     else:
         print('no new notice')
 
-schedule.every(60*60).seconds.do(job)
+schedule.every(60).seconds.do(job)
 
 
 def home(request):
