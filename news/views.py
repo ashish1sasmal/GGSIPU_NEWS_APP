@@ -1,6 +1,10 @@
 from django.shortcuts import render
 import schedule
 import os
+
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+
 import time
 import smtplib
 from bs4 import BeautifulSoup
@@ -13,18 +17,21 @@ EMAIL_PASS = os.environ.get('EMAIL_PASS')
 day=date.today().strftime("%d-%m-%Y")
 
 def send_email(subject,msg,email_id):
-    try:
+
+
         server = smtplib.SMTP('smtp.gmail.com:587')
         server.ehlo()
         server.starttls()
         server.login(EMAIL_ID,EMAIL_PASS)
-        print("here")
-        message = f'Subject:{subject}\n\n{msg}'
-        server.sendmail(EMAIL_ID,email_id,message)
+        print("after login")
+        notice=""
+        for i in msg:
+            notice+="\nTITLE : "+str(i[0])+"\nURL : "+str(i[1])+"\n"
+        print(notice)
+        server.sendmail(EMAIL_ID,email_id,notice)
         server.quit()
-        print("success!")
-    except:
-        print("email failed!")
+        print("success! after sent!")
+
 
 def job():
     subject = "HELlo"
@@ -39,6 +46,8 @@ def test(request):
         time.sleep(1)
     return render(request,'news/home.html')
 
+
+
 def home(request):
     latest=scrap_notices()
     print(latest)
@@ -46,10 +55,12 @@ def home(request):
     if latest!=[]:
         form = LastNotice(title=latest[0][0],url=latest[0][1])
         form.save()
-        print('success')
-        send_email("ggsipu notice",str(latest),"ashishsasmal1@gmail.com")
+        print('success after scrap')
     else:
         print('no new notice')
+    send_email("ggsipu notice",latest,"ashishsasmal1@gmail.com")
+
+
     return render(request,'news/test.html')
 
 
@@ -66,11 +77,9 @@ def scrap_notices():
     latest=[]
     index=0
     for notice in notices:
-        print('y')
         l=notice('td')
         if len(l)>1:
             text=l[0].a.get_text()
-            print(LastNotice.objects.last().title)
             if (l[-1].get_text()==day) and LastNotice.objects.last().title!=text:
                 latest.append([text,("http://www.ipu.ac.in"+(l[0].a)['href'])])
                 index+=1
