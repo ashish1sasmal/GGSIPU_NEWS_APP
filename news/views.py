@@ -5,6 +5,8 @@ import time
 import smtplib
 from bs4 import BeautifulSoup
 import requests
+from .models import LastNotice
+from datetime import date
 
 EMAIL_ID = os.environ.get('EMAIL_ID')
 EMAIL_PASS = os.environ.get('EMAIL_PASS')
@@ -28,17 +30,31 @@ def job():
     msg="come tommorrow"
     send_email(subject,msg,"ashishsasmal1@gmail.com")
 
-schedule.every(60*30).seconds.do(job)
+schedule.every(10).seconds.do(job)
 
-def home(request):
+def test(request):
     while True:
         schedule.run_pending()
         time.sleep(1)
     return render(request,'news/home.html')
 
-def test(request):
+def home(request):
 
     return render(request,'news/test.html')
 
 
 ############$$$$$$$$$$$$$$ W E B - S C R A P I N G $$$$$$$$$$$$$$#########################
+
+source  = requests.get('http://www.ipu.ac.in/notices.php').text
+soup = BeautifulSoup(source,'lxml')
+notices = soup.find_all('tr')
+
+day=date.today().strftime("%d-%m-%Y")
+
+for notice in notices:
+    l=notice('td')
+    if len(l)>1:
+        if (l[-1].get_text()==day):
+            print(l[0].a.get_text())
+            print("http://www.ipu.ac.in"+(l[0].a)['href'])
+            print()
