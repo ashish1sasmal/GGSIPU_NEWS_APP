@@ -17,7 +17,7 @@ EMAIL_PASS = os.environ.get('EMAIL_PASS')
 day=date.today().strftime("%d-%m-%Y")
 
 def send_email(subject,msg,email_id):
-
+        print("inside login!")
 
         server = smtplib.SMTP('smtp.gmail.com:587')
         server.ehlo()
@@ -34,21 +34,6 @@ def send_email(subject,msg,email_id):
 
 
 def job():
-    subject = "HELlo"
-    msg="come tommorrow"
-    send_email(subject,msg,"ashishsasmal1@gmail.com")
-
-schedule.every(10).seconds.do(job)
-
-def test(request):
-    while True:
-        schedule.run_pending()
-        time.sleep(1)
-    return render(request,'news/home.html')
-
-
-
-def home(request):
     latest=scrap_notices()
     print(latest)
 
@@ -56,10 +41,21 @@ def home(request):
         form = LastNotice(title=latest[0][0],url=latest[0][1])
         form.save()
         print('success after scrap')
+        send_email("ggsipu notice",latest,"ashishsasmal1@gmail.com")
     else:
         print('no new notice')
-    send_email("ggsipu notice",latest,"ashishsasmal1@gmail.com")
 
+schedule.every(10).seconds.do(job)
+
+
+def home(request):
+    return render(request,'news/home.html')
+
+def test(request):
+
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
 
     return render(request,'news/test.html')
 
