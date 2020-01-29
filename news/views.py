@@ -38,7 +38,7 @@ def send_email(subject,msg,email_id):
 def job():
     latest=scrap_notices()
     print(latest)
-
+    print("in latest")
     if latest!=[]:
         form = LastNotice(title=latest[0][0],url=latest[0][1])
         form.save()
@@ -46,8 +46,8 @@ def job():
         send_email("ggsipu notice",latest,"ashishsasmal1@gmail.com")
     else:
         print('no new notice')
-
-schedule.every(10).seconds.do(job)
+    print(LastNotice.objects.all())
+schedule.every(120).seconds.do(job)
 
 
 def home(request):
@@ -62,6 +62,7 @@ def home(request):
             messages.warning(request,'You are already subscribed!')
     job()
     return render(request,'news/home.html')
+
 
 def test(request):
 
@@ -84,15 +85,18 @@ def scrap_notices():
 
     latest=[]
     index=0
+    print(day)
+    print(LastNotice.objects.last().title)
     for notice in notices:
         l=notice('td')
         if len(l)>1:
             text=l[0].a.get_text()
-            if (l[-1].get_text()==day) and LastNotice.objects.last().title!=text:
+            print(text)
+            if LastNotice.objects.last().title!=text:
                 latest.append([text,("http://www.ipu.ac.in"+(l[0].a)['href'])])
                 index+=1
 
             else:
                 break
-
+    print(latest)
     return latest
