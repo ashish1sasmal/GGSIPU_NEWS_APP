@@ -92,7 +92,7 @@ def scrap_notices():
         if len(l)>1:
             text=l[0].a.get_text()
             print(text)
-            if LastNotice.objects.last().title!=text:
+            if (l[-1].get_text()==day) and LastNotice.objects.last().title!=text:
                 latest.append([text,("http://www.ipu.ac.in"+(l[0].a)['href'])])
                 index+=1
 
