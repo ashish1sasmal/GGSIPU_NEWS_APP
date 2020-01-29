@@ -40,9 +40,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 ]
 
-CRONJOBS = [
-    ('*/1 * * * *', 'news.cron.my_cron_job')
-]
+# CRONJOBS = [
+#     ('*/1 * * * *', 'news.cron.my_cron_job')
+# ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
