@@ -1,5 +1,4 @@
 from django.shortcuts import render
-import schedule
 import os
 
 from email.mime.multipart import MIMEMultipart
@@ -9,6 +8,9 @@ import time
 import smtplib
 from bs4 import BeautifulSoup
 import requests
+
+from apscheduler.schedulers.background import BackgroundScheduler
+
 from .models import LastNotice,Profile
 from datetime import date
 
@@ -16,7 +18,13 @@ EMAIL_ID = os.environ.get('EMAIL_ID')
 EMAIL_PASS = os.environ.get('EMAIL_PASS')
 day=date.today().strftime("%d-%m-%Y")
 
-def send_email(subject,msg,email_id):
+
+def start():
+    scheduler = BackgroundScheduler()
+    scheduler.add_job(job, 'interval', minutes=5)
+    scheduler.start()
+
+def send_email(subject,msg):
         print("inside login!")
 
         server = smtplib.SMTP('smtp.gmail.com:587')
@@ -36,18 +44,19 @@ def send_email(subject,msg,email_id):
 
 
 def job():
+    print("job running")
     latest=scrap_notices()
-    print(latest)
-    print("in latest")
+    print("after scrap")
     if latest!=[]:
         form = LastNotice(title=latest[0][0],url=latest[0][1])
         form.save()
         print('success after scrap')
-        send_email("ggsipu notice",latest,"ashishsasmal1@gmail.com")
+        send_email("ggsipu notice",latest)
     else:
         print('no new notice')
     print(LastNotice.objects.all())
-schedule.every(120).seconds.do(job)
+
+# schedule.every(120).seconds.do(job)
 
 
 def home(request):
@@ -60,17 +69,8 @@ def home(request):
             messages.success(request,'You are subscribed!')
         else:
             messages.warning(request,'You are already subscribed!')
-    job()
     return render(request,'news/home.html')
 
-
-def test(request):
-
-    while True:
-        schedule.run_pending()
-        time.sleep(1)
-
-    return render(request,'news/test.html')
 
 
 ############$$$$$$$$$$$$$$ W E B - S C R A P I N G $$$$$$$$$$$$#########################
@@ -78,7 +78,7 @@ def test(request):
 
 
 def scrap_notices():
-    print('here')
+    print('inside scrap notice')
     source  = requests.get('http://www.ipu.ac.in/notices.php').text
     soup = BeautifulSoup(source,'lxml')
     notices = soup.find_all('tr')
